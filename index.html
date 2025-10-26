@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="pt-pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Magia das Marés - App Didática</title>
+    <!-- Carregar Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Esconder todos os "ecrãs" por defeito */
+        .screen {
+            display: none;
+        }
+        /* Mostrar o primeiro ecrã */
+        #welcome-screen {
+            display: block;
+        }
+
+        /* Estilos do Modal de Zoom de Imagem */
+        #image-modal, #video-modal {
+            display: none; /* Escondido por defeito */
+        }
+        #image-modal.flex, #video-modal.flex {
+            display: flex; /* Mostrar quando ativado */
+        }
+
+        /* Estilos de Impressão para o Certificado */
+        @media print {
+            /* Esconder tudo exceto a área do certificado */
+            body * {
+                visibility: hidden;
+            }
+            #certificate-area, #certificate-area * {
+                visibility: visible;
+            }
+            #certificate-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                flex-direction: column; /* Garantir que o layout vertical funciona */
+                align-items: center;
+                justify-content: center;
+            }
+            /* Esconder botões na impressão */
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-blue-50 font-sans min-h-screen flex items-center justify-center p-4">
+
+    <div class="container mx-auto max-w-2xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden">
+
+        <!-- ECRÃ 1: BEM-VINDO -->
+        <div id="welcome-screen" class="screen p-8 md:p-12 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-blue-900">A Magia das Marés 🌊</h1>
+            <p class="text-lg text-gray-700 mt-4">Olá! Vamos descobrir juntos como a Lua e o Sol criam o ritmo dos nossos oceanos.</p>
+            <p class="text-gray-600 mt-2">Vais aprender tudo passo a passo e, no final, podes testar o que aprendeste!</p>
+            <button onclick="startApp()" class="mt-8 bg-blue-600 text-white font-bold py-3 px-8 rounded-lg text-lg hover:bg-blue-700 transition duration-300 shadow-lg">
+                Começar a Aventura!
+            </button>
+            <!-- Botão de Vídeo Adicionado -->
+            <button onclick="openVideoModal()" class="mt-4 bg-gray-700 text-white font-bold py-2 px-6 rounded-lg text-base hover:bg-gray-800 transition duration-300 shadow-md">
+                🎥 Ver Vídeo Explicativo
+            </button>
+        </div>
+
+        <!-- ECRÃ 2: MÓDULOS DE APRENDIZAGEM (SLIDES) -->
+        <div id="slides-screen" class="screen">
+            <div id="slide-content" class="p-6 md:p-8">
+                <!-- O conteúdo do slide será injetado aqui pelo JavaScript -->
+            </div>
+            
+            <div class="px-6 md:px-8 pb-6 flex justify-between items-center bg-gray-50 border-t border-gray-200">
+                <!-- Botão Início Adicionado -->
+                <button onclick="goToHome()" class="bg-gray-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-600 transition duration-300 text-sm">
+                    Início
+                </button>
+                
+                <span id="slide-counter" class="text-sm text-gray-500"></span>
+                
+                <div class="space-x-2"> <!-- Reduzi o space-x para caber melhor -->
+                    <button id="prev-btn" onclick="prevSlide()" class="bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg hover:bg-gray-400 transition duration-300">
+                        Anterior
+                    </button>
+                    <button id="next-btn" onclick="nextSlide()" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-300">
+                        Próximo
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ECRÃ 3: INÍCIO DO QUIZ -->
+        <div id="quiz-start-screen" class="screen p-8 md:p-12 text-center">
+            <h1 class="text-3xl font-bold text-blue-900">Está na Hora de Testar!</h1>
+            <p class="text-lg text-gray-700 mt-4">Completaste a lição! Agora vamos ver o que aprendeste.</p>
+            <p class="text-gray-600 mt-2">Por favor, insere o teu nome para o certificado.</p>
+            
+            <div class="mt-6">
+                <label for="nome-aluno" class="block text-sm font-medium text-gray-700 text-left">O teu Nome:</label>
+                <input type="text" id="nome-aluno" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-lg" placeholder="Escreve o teu nome aqui">
+                <p id="name-error" class="text-red-500 text-sm mt-1 hidden">Por favor, insere o teu nome.</p>
+            </div>
+            
+            <!-- Botões de navegação do Quiz (Voltar e Começar) -->
+            <div class="mt-8 flex flex-col sm:flex-row justify-center sm:space-x-4 space-y-4 sm:space-y-0">
+                <button onclick="goToSlides()" class="bg-gray-500 text-white font-bold py-3 px-8 rounded-lg text-lg hover:bg-gray-600 transition duration-300 shadow-lg">
+                    Voltar
+                </button>
+                <button onclick="startQuiz()" class="bg-green-600 text-white font-bold py-3 px-8 rounded-lg text-lg hover:bg-green-700 transition duration-300 shadow-lg">
+                    Começar o Quiz!
+                </button>
+            </div>
+        </div>
+
+        <!-- ECRÃ 4: QUIZ -->
+        <div id="quiz-screen" class="screen p-6 md:p-8">
+            <div id="quiz-header" class="mb-4">
+                <h2 class="text-2xl font-bold text-blue-900">Pergunta <span id="question-number">1</span> de <span id="total-questions">8</span></h2>
+            </div>
+            <div id="question-content">
+                <!-- O conteúdo da pergunta será injetado aqui -->
+            </div>
+            <div class="mt-8 flex justify-end">
+                <button id="next-question-btn" onclick="nextQuestion()" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-300 disabled:opacity-50" disabled>
+                    Próxima Pergunta
+                </button>
+                <button id="finish-quiz-btn" onclick="submitQuiz()" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition duration-300 hidden disabled:opacity-50" disabled>
+                    Terminar Quiz
+                </button>
+            </div>
+        </div>
+
+        <!-- ECRÃ 5: RESULTADOS E CERTIFICADO -->
+        <div id="result-screen" class="screen p-8 md:p-12 text-center">
+            
+            <!-- Esta é a área que será impressa -->
+            <div id="certificate-area" class="bg-white p-6 md:p-10 border-4 border-blue-800 rounded-lg" style="border-style: double;">
+                <h1 class="text-2xl md:text-3xl font-bold text-blue-900">Certificado de Conclusão</h1>
+                <p class="text-lg text-gray-600 mt-4">Este certificado é concedido a</p>
+                <h2 id="nome-certificado" class="text-3xl md:text-4xl font-bold text-blue-700 my-4">
+                    <!-- Nome do Aluno -->
+                </h2>
+                <p class="text-lg text-gray-600">Pela conclusão com sucesso do módulo didático</p>
+                <p class="text-xl font-semibold text-gray-800 mt-1">"A Magia das Marés"</p>
+                <p class="text-lg text-gray-700 mt-6">Com uma pontuação de:</p>
+                <!-- Pontuação Atualizada -->
+                <div id="pontuacao-texto" class="mt-2">
+                    <!-- Pontuação injetada pelo JS -->
+                </div>
+            </div>
+            
+            <!-- Botões (não serão impressos) -->
+            <div class="mt-8 space-x-4 no-print">
+                <button onclick="printCertificate()" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-300">
+                    Imprimir Certificado
+                </button>
+                <button onclick="restartApp()" class="bg-gray-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-gray-600 transition duration-300">
+                    Tentar Novamente
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ECRÃ MODAL DE IMAGEM (PARA ZOOM) -->
+    <div id="image-modal" class="fixed inset-0 bg-black bg-opacity-75 items-center justify-center p-4 z-50" onclick="closeModal()">
+        <img id="modal-image" src="" alt="Imagem Ampliada" class="max-w-full max-h-full rounded-lg shadow-lg" onclick="event.stopPropagation()">
+        <button class="absolute top-4 right-4 text-white text-5xl font-bold leading-none" onclick="closeModal()">&times;</button>
+    </div>
+
+    <!-- ECRÃ MODAL DE VÍDEO (ADICIONADO) -->
+    <div id="video-modal" class="fixed inset-0 bg-black bg-opacity-75 items-center justify-center p-4 z-50" onclick="closeVideoModal()">
+        <div class="relative bg-black rounded-lg shadow-lg w-full max-w-2xl" onclick="event.stopPropagation()">
+            <video id="video-player" class="w-full rounded-lg" controls>
+                <source src="./aforcadamare.mp4" type="video/mp4">
+                O seu navegador não suporta a tag de vídeo.
+            </video>
+            <button class="absolute -top-3 -right-3 text-white bg-gray-800 rounded-full h-10 w-10 text-2xl font-bold leading-none" onclick="closeVideoModal()">&times;</button>
+        </div>
+    </div>
+
+
+    <script>
+        // --- DADOS DA APLICAÇÃO ---
+
+        const slideData = [
+            {
+                title: "O Pulso do Planeta",
+                image: "./imagem1.png",
+                text: "Bem-vindo! Já reparaste como o mar sobe e desce na praia? Isso chama-se maré. É como o 'pulso' do nosso planeta, um bailado cósmico onde a Lua é a maestrina principal e o Sol é o seu ajudante."
+            },
+            {
+                title: "A Força Secreta da Lua",
+                image: "./imagem2.png",
+                text: "Não é magia, é a 'Força de Maré'! A Lua não 'puxa' a água para cima. O segredo é que a sua atração é mais forte no lado da Terra mais próximo dela e mais fraca no lado oposto. Esta *diferença* de força 'estica' os oceanos, criando duas saliências de água."
+            },
+            {
+                title: "O Atraso de 50 Minutos",
+                image: "./imagem3.png",
+                text: "A Terra gira por baixo dessas duas saliências, o que nos dá as marés altas. Mas por que é que a maré se atrasa todos os dias? Porque o ciclo segue o 'Dia Lunar' (24h 50min). Enquanto a Terra gira, a Lua também anda um pouco, e a Terra precisa de 50 minutos extra para 'apanhá-la'."
+            },
+            {
+                title: "Marés Vivas: Força Total!",
+                image: "./imagem4.png",
+                text: "Quando o Sol, a Terra e a Lua estão ALINHADOS (na Lua Nova ou Lua Cheia), as suas forças de maré somam-se! Isto cria as 'Marés Vivas', com as marés altas mais altas e as marés baixas mais baixas de todas."
+            },
+            {
+                title: "Marés Mortas: Luta de Forças",
+                image: "./imagem5.png",
+                text: "E quando a Lua e o Sol fazem um ângulo de 90 graus (Quarto Crescente ou Minguante)? As suas forças 'lutam' uma contra a outra e cancelam-se parcialmente. Isto cria as 'Marés Mortas', que são muito mais fracas e com pouca diferença entre maré alta e baixa."
+            },
+            {
+                title: "O Efeito Funil",
+                image: "./imagem6.png",
+                text: "Porque é que em alguns lugares a maré sobe 16 metros e noutros quase não se nota? A geografia! Baías e estuários estreitos funcionam como um funil: 'apertam' a onda de maré e forçam a água a subir muito mais alto. É o 'efeito de canalização'."
+            },
+            {
+                title: "Curiosidade: A Lua em Fuga!",
+                image: "./imagem7.png",
+                text: "Sabias que as marés estão a 'travar' a rotação da Terra? (Muito, muito devagarinho!). Para conservar a energia, essa energia 'perdida' é transferida para a Lua, que se afasta de nós cerca de 3,8 centímetros por ano. É como se estivesse a fugir!"
+            },
+            {
+                title: "O Fim da Lição!",
+                image: "./imagem8.png",
+                text: "Parabéns! Já sabes o básico sobre a dança da Terra, da Lua e do Sol. As marés são a prova visível desta ligação cósmica. Estás pronto para testar o que aprendeste?"
+            }
+        ];
+
+        // --- QUIZ AUMENTADO PARA 8 PERGUNTAS ---
+        const quizData = [
+            {
+                question: "Qual é a PRINCIPAL causa das marés?",
+                options: ["O vento forte no oceano", "A rotação da Terra", "A força de maré da Lua", "O calor do Sol"],
+                correct: "A força de maré da Lua"
+            },
+            {
+                question: "Porque é que a maré alta ocorre cerca de 50 minutos mais tarde a cada dia?",
+                options: ["Porque o Sol se move", "Porque o ciclo segue o 'Dia Lunar' (24h 50min)", "Por causa do Verão e Inverno", "Porque os barcos atrasam a água"],
+                correct: "Porque o ciclo segue o 'Dia Lunar' (24h 50min)"
+            },
+            {
+                question: "O que acontece durante as 'Marés Vivas'?",
+                options: ["O Sol e a Lua estão em ângulo de 90 graus", "As marés são fracas e morrem", "O Sol, a Terra e a Lua estão alinhados e as suas forças somam-se", "Só acontecem de dia"],
+                correct: "O Sol, a Terra e a Lua estão alinhados e as suas forças somam-se"
+            },
+            {
+                question: "O que são 'Marés Mortas'?",
+                options: ["Marés muito perigosas", "Marés fracas, quando o Sol e a Lua se opõem (ângulo 90º)", "Marés que acontecem à noite", "Marés com peixes mortos"],
+                correct: "Marés fracas, quando o Sol e a Lua se opõem (ângulo 90º)"
+            },
+            {
+                question: "Quantas 'saliências' de maré (zonas de maré alta) existem na Terra ao mesmo tempo?",
+                options: ["Uma, virada para a Lua", "Duas, em lados opostos", "Quatro, uma em cada polo", "Nenhuma, a água é plana"],
+                correct: "Duas, em lados opostos"
+            },
+            {
+                question: "O que é o 'efeito de canalização' (ou funil)?",
+                options: ["A Lua a tapar o Sol", "Baías estreitas que 'apertam' a água e aumentam a maré", "O atraso de 50 minutos", "A força do vento a empurrar a maré"],
+                correct: "Baías estreitas que 'apertam' a água e aumentam a maré"
+            },
+            {
+                question: "Qual astro tem a maior *Força de Maré* sobre a Terra (o maior *efeito* de maré)?",
+                options: ["O Sol, porque é maior", "A Lua, porque está mais perto", "Marte, por causa da cor", "Júpiter, por causa da gravidade"],
+                correct: "A Lua, porque está mais perto"
+            },
+            {
+                question: "O que está a acontecer à Lua como consequência das marés?",
+                options: ["Está a aproximar-se da Terra", "Está a afastar-se lentamente da Terra", "Está a girar mais rápido", "Não sofre efeito nenhum"],
+                correct: "Está a afastar-se lentamente da Terra"
+            }
+        ];
+
+        // --- LÓGICA DA APLICAÇÃO ---
+
+        let currentSlide = 0;
+        let currentQuestion = 0;
+        let userName = "";
+        let userAnswers = new Array(quizData.length).fill(null);
+        let score = 0;
+
+        // Função para trocar de ecrã
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.style.display = 'none';
+            });
+            document.getElementById(screenId).style.display = 'block';
+        }
+
+        // --- Lógica dos Slides e Modal ---
+
+        function startApp() {
+            showScreen('slides-screen');
+            loadSlide(0);
+        }
+
+        // Novas funções de navegação
+        function goToHome() {
+            showScreen('welcome-screen');
+        }
+
+        function goToSlides() {
+            showScreen('slides-screen');
+        }
+
+        function loadSlide(slideIndex) {
+            const slide = slideData[slideIndex];
+            const contentDiv = document.getElementById('slide-content');
+            
+            // Adicionado cursor-pointer e onclick para abrir o modal
+            contentDiv.innerHTML = `
+                <h2 class="text-3xl font-bold text-blue-900 mb-4">${slide.title}</h2>
+                <img src="${slide.image}" alt="${slide.title}" class="w-full h-64 md:h-80 object-cover rounded-lg shadow-md mb-6 cursor-pointer" onerror="this.src='https://placehold.co/600x400/e2e8f0/94a3b8?text=Imagem+N%C3%A3o+Encontrada'; this.onerror=null;" onclick="openModal('${slide.image}')">
+                <p class="text-lg text-gray-700 leading-relaxed">${slide.text}</p>
+            `;
+            
+            // Atualizar contador
+            document.getElementById('slide-counter').textContent = `Módulo ${slideIndex + 1} de ${slideData.length}`;
+            
+            // Gerir botões
+            document.getElementById('prev-btn').style.display = (slideIndex === 0) ? 'none' : 'inline-block';
+            
+            if (slideIndex === slideData.length - 1) {
+                document.getElementById('next-btn').textContent = 'Ir para o Quiz!';
+            } else {
+                document.getElementById('next-btn').textContent = 'Próximo';
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < slideData.length - 1) {
+                currentSlide++;
+                loadSlide(currentSlide);
+            } else {
+                // Último slide, ir para o quiz
+                showScreen('quiz-start-screen');
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                loadSlide(currentSlide);
+            }
+        }
+
+        // Funções do Modal de Imagem
+        function openModal(src) {
+            document.getElementById('modal-image').src = src;
+            document.getElementById('image-modal').classList.add('flex');
+        }
+
+        function closeModal() {
+            document.getElementById('image-modal').classList.remove('flex');
+        }
+
+        // Funções do Modal de Vídeo (Alteradas para evitar AbortError)
+        async function openVideoModal() {
+            document.getElementById('video-modal').classList.add('flex');
+            try {
+                // O play() devolve uma promessa. Vamos aguardar por ela.
+                await document.getElementById('video-player').play();
+            } catch (err) {
+                // Se o utilizador fechar o modal rapidamente, um AbortError
+                // pode ser lançado. Podemos ignorá-lo com segurança.
+                if (err.name !== 'AbortError') {
+                    console.error("Erro ao tentar reproduzir o vídeo:", err);
+                }
+            }
+        }
+
+        function closeVideoModal() {
+            document.getElementById('video-modal').classList.remove('flex');
+            document.getElementById('video-player').pause();
+            document.getElementById('video-player').currentTime = 0; // Reinicia o vídeo
+        }
+
+
+        // --- Lógica do Quiz com Feedback Imediato ---
+
+        function startQuiz() {
+            userName = document.getElementById('nome-aluno').value;
+            const errorP = document.getElementById('name-error');
+            
+            if (userName.trim() === "") {
+                errorP.style.display = 'block';
+            } else {
+                errorP.style.display = 'none';
+                showScreen('quiz-screen');
+                loadQuestion(0);
+            }
+        }
+
+        function loadQuestion(questionIndex) {
+            const question = quizData[questionIndex];
+            const contentDiv = document.getElementById('question-content');
+            
+            let optionsHtml = '';
+            question.options.forEach((option, index) => {
+                // A função checkAnswer será chamada no onchange
+                optionsHtml += `
+                    <label class="block w-full p-4 border border-gray-300 rounded-lg mb-3 hover:bg-blue-50 cursor-pointer">
+                        <input type="radio" name="q${questionIndex}" value="${option}" class="mr-3" onchange="checkAnswer(this)">
+                        <span class="text-lg text-gray-800">${option}</span>
+                    </label>
+                `;
+            });
+            
+            contentDiv.innerHTML = `
+                <p class="text-xl text-gray-800 mb-6">${question.question}</p>
+                <div class="space-y-3" id="options-container">${optionsHtml}</div>
+                <div id="feedback-message" class="mt-4 text-lg font-bold"></div>
+            `;
+            
+            // Atualizar cabeçalho
+            document.getElementById('question-number').textContent = questionIndex + 1;
+            document.getElementById('total-questions').textContent = quizData.length;
+            
+            // Gerir botões
+            const nextBtn = document.getElementById('next-question-btn');
+            const finishBtn = document.getElementById('finish-quiz-btn');
+
+            // Desativar botões até que uma resposta seja dada
+            nextBtn.disabled = true;
+            finishBtn.disabled = true;
+
+            if (questionIndex === quizData.length - 1) {
+                nextBtn.style.display = 'none';
+                finishBtn.style.display = 'inline-block';
+            } else {
+                nextBtn.style.display = 'inline-block';
+                finishBtn.style.display = 'none';
+            }
+        }
+
+        function checkAnswer(selectedRadio) {
+            const questionIndex = currentQuestion;
+            const selectedValue = selectedRadio.value;
+            const question = quizData[questionIndex];
+            const feedbackEl = document.getElementById('feedback-message');
+            
+            // Salvar resposta
+            userAnswers[questionIndex] = selectedValue;
+
+            // Desativar todas as opções para esta pergunta
+            const radios = document.querySelectorAll(`input[name="q${questionIndex}"]`);
+            radios.forEach(radio => {
+                radio.disabled = true;
+                const label = radio.parentElement;
+                label.classList.remove('hover:bg-blue-50', 'cursor-pointer');
+
+                // Aplicar estilos de feedback
+                if (radio.value === question.correct) {
+                    label.classList.add('bg-green-200', 'border-green-400');
+                } else if (radio.value === selectedValue) {
+                    label.classList.add('bg-red-200', 'border-red-400');
+                }
+            });
+
+            // Mostrar mensagem de feedback
+            if (selectedValue === question.correct) {
+                feedbackEl.textContent = "Correto! 🎉";
+                feedbackEl.className = "mt-4 text-lg font-bold text-green-600";
+            } else {
+                feedbackEl.textContent = "Incorreto. A resposta certa está a verde.";
+                feedbackEl.className = "mt-4 text-lg font-bold text-red-600";
+            }
+
+            // Ativar o botão de próxima pergunta ou finalizar
+            if (currentQuestion === quizData.length - 1) {
+                document.getElementById('finish-quiz-btn').disabled = false;
+            } else {
+                document.getElementById('next-question-btn').disabled = false;
+            }
+        }
+
+        function nextQuestion() {
+            // A resposta já foi guardada em checkAnswer
+            if (currentQuestion < quizData.length - 1) {
+                currentQuestion++;
+                loadQuestion(currentQuestion);
+            }
+        }
+
+        function submitQuiz() {
+            // A resposta final já foi guardada em checkAnswer
+            
+            // Calcular pontuação
+            score = 0;
+            for (let i = 0; i < quizData.length; i++) {
+                if (userAnswers[i] === quizData[i].correct) {
+                    score++;
+                }
+            }
+            
+            const totalQuestions = quizData.length;
+            const incorrect = totalQuestions - score;
+            const percentage = Math.round((score / totalQuestions) * 100);
+
+            // Mostrar resultados
+            showScreen('result-screen');
+            document.getElementById('nome-certificado').textContent = userName;
+            
+            // Nova secção de pontuação
+            document.getElementById('pontuacao-texto').innerHTML = `
+                <span class="text-4xl font-bold text-green-600">${percentage}%</span>
+                <p class="text-lg text-gray-700 mt-2">
+                    (${score} corretas, ${incorrect} incorretas)
+                </p>
+            `;
+        }
+
+        // --- Lógica do Certificado e Reinício ---
+
+        function printCertificate() {
+            window.print();
+        }
+
+        function restartApp() {
+            currentSlide = 0;
+            currentQuestion = 0;
+            userName = "";
+            userAnswers = new Array(quizData.length).fill(null);
+            score = 0;
+            document.getElementById('nome-aluno').value = '';
+            showScreen('welcome-screen');
+        }
+
+    </script>
+</body>
+</html>
