@@ -24,6 +24,51 @@
             display: flex; /* Mostrar quando ativado */
         }
 
+        /* --- NOVOS ESTILOS PARA O EXERCÍCIO (DRAG & DROP) --- */
+
+        /* Estilo para os termos arrastáveis */
+        .draggable {
+            cursor: move;
+            transition: all 0.2s ease;
+            user-select: none; /* Impedir seleção de texto ao arrastar */
+        }
+        /* Estilo para o termo enquanto está a ser arrastado */
+        .dragging {
+            opacity: 0.5;
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Estilo para as caixas onde se largam os termos */
+        .dropzone {
+            min-height: 50px; /* Altura mínima para ser um alvo fácil */
+            transition: all 0.2s ease;
+            display: flex; /* Para centrar o item largado */
+            align-items: center;
+            justify-content: center;
+        }
+        /* Estilo visual quando um item arrastável passa por cima */
+        .drop-over {
+            background-color: #ecf3fe; /* Azul muito claro */
+            border-style: dashed;
+        }
+        
+        /* Estilo para quando o item correto é largado */
+        .dropzone.correct {
+            background-color: #dcfce7; /* Verde claro */
+            border-color: #22c55e; /* Verde */
+        }
+        .draggable.correct {
+            cursor: default;
+            background-color: #22c55e; /* Verde */
+            color: white;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* --- FIM DOS NOVOS ESTILOS --- */
+
+
         /* Estilos de Impressão para o Certificado */
         @media print {
             /* Esconder tudo exceto a área do certificado */
@@ -55,7 +100,7 @@
 
     <div class="container mx-auto max-w-2xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden">
 
-        <!-- ECRÃ 1: BEM-VINDO -->
+        <!-- ECRÃ 1: BEM-VINDO (Sem alterações) -->
         <div id="welcome-screen" class="screen p-8 md:p-12 text-center">
             <h1 class="text-3xl md:text-4xl font-bold text-blue-900">A Magia das Marés 🌊</h1>
             <p class="text-lg text-gray-700 mt-4">Olá! Vamos descobrir juntos como a Lua e o Sol criam o ritmo dos nossos oceanos.</p>
@@ -63,27 +108,23 @@
             <button onclick="startApp()" class="mt-8 bg-blue-600 text-white font-bold py-3 px-8 rounded-lg text-lg hover:bg-blue-700 transition duration-300 shadow-lg">
                 Começar a Aventura!
             </button>
-            <!-- Botão de Vídeo Adicionado -->
             <button onclick="openVideoModal()" class="mt-4 bg-gray-700 text-white font-bold py-2 px-6 rounded-lg text-base hover:bg-gray-800 transition duration-300 shadow-md">
                 🎥 Ver Vídeo Explicativo
             </button>
         </div>
 
-        <!-- ECRÃ 2: MÓDULOS DE APRENDIZAGEM (SLIDES) -->
+        <!-- ECRÃ 2: MÓDULOS DE APRENDIZAGEM (Sem alterações) -->
         <div id="slides-screen" class="screen">
             <div id="slide-content" class="p-6 md:p-8">
                 <!-- O conteúdo do slide será injetado aqui pelo JavaScript -->
             </div>
             
             <div class="px-6 md:px-8 pb-6 flex justify-between items-center bg-gray-50 border-t border-gray-200">
-                <!-- Botão Início Adicionado -->
                 <button onclick="goToHome()" class="bg-gray-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-600 transition duration-300 text-sm">
                     Início
                 </button>
-                
                 <span id="slide-counter" class="text-sm text-gray-500"></span>
-                
-                <div class="space-x-2"> <!-- Reduzi o space-x para caber melhor -->
+                <div class="space-x-2">
                     <button id="prev-btn" onclick="prevSlide()" class="bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg hover:bg-gray-400 transition duration-300">
                         Anterior
                     </button>
@@ -94,7 +135,7 @@
             </div>
         </div>
 
-        <!-- ECRÃ 3: INÍCIO DO QUIZ -->
+        <!-- ECRÃ 3: INÍCIO DO QUIZ (Sem alterações) -->
         <div id="quiz-start-screen" class="screen p-8 md:p-12 text-center">
             <h1 class="text-3xl font-bold text-blue-900">Está na Hora de Testar!</h1>
             <p class="text-lg text-gray-700 mt-4">Completaste a lição! Agora vamos ver o que aprendeste.</p>
@@ -106,7 +147,6 @@
                 <p id="name-error" class="text-red-500 text-sm mt-1 hidden">Por favor, insere o teu nome.</p>
             </div>
             
-            <!-- Botões de navegação do Quiz (Voltar e Começar) -->
             <div class="mt-8 flex flex-col sm:flex-row justify-center sm:space-x-4 space-y-4 sm:space-y-0">
                 <button onclick="goToSlides()" class="bg-gray-500 text-white font-bold py-3 px-8 rounded-lg text-lg hover:bg-gray-600 transition duration-300 shadow-lg">
                     Voltar
@@ -117,7 +157,7 @@
             </div>
         </div>
 
-        <!-- ECRÃ 4: QUIZ -->
+        <!-- ECRÃ 4: QUIZ (Sem alterações) -->
         <div id="quiz-screen" class="screen p-6 md:p-8">
             <div id="quiz-header" class="mb-4">
                 <h2 class="text-2xl font-bold text-blue-900">Pergunta <span id="question-number">1</span> de <span id="total-questions">8</span></h2>
@@ -135,10 +175,40 @@
             </div>
         </div>
 
-        <!-- ECRÃ 5: RESULTADOS E CERTIFICADO -->
+        <!-- ECRÃ 5: NOVO EXERCÍCIO DRAG & DROP -->
+        <div id="exercise-screen" class="screen p-6 md:p-8">
+            <h2 class="text-3xl font-bold text-blue-900 mb-4">Exercício: Ligar Termos</h2>
+            <p class="text-lg text-gray-700 mb-6">Arrasta cada termo (à esquerda) para a sua definição correta (à direita).</p>
+
+            <div class="flex flex-col md:flex-row md:space-x-6">
+                <!-- Coluna dos Termos (Arrastáveis) -->
+                <div class="w-full md:w-1/3 mb-6 md:mb-0">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3 border-b-2 border-blue-200 pb-2">Termos</h3>
+                    <div id="term-container" class="space-y-3">
+                        <!-- Os termos arrastáveis serão injetados aqui pelo JS -->
+                    </div>
+                </div>
+                
+                <!-- Coluna das Definições (Alvos) -->
+                <div class="w-full md:w-2/3">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3 border-b-2 border-blue-200 pb-2">Definições</h3>
+                    <div id="definition-container" class="space-y-4">
+                        <!-- As definições e caixas de largar serão injetadas aqui pelo JS -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 flex justify-end">
+                <button id="finish-exercise-btn" onclick="showResults()" class="bg-green-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-green-700 transition duration-300 shadow-lg disabled:opacity-50" disabled>
+                    Ver Certificado
+                </button>
+            </div>
+        </div>
+
+
+        <!-- ECRÃ 6: RESULTADOS E CERTIFICADO (Anterior Ecrã 5) -->
         <div id="result-screen" class="screen p-8 md:p-12 text-center">
             
-            <!-- Esta é a área que será impressa -->
             <div id="certificate-area" class="bg-white p-6 md:p-10 border-4 border-blue-800 rounded-lg" style="border-style: double;">
                 <h1 class="text-2xl md:text-3xl font-bold text-blue-900">Certificado de Conclusão</h1>
                 <p class="text-lg text-gray-600 mt-4">Este certificado é concedido a</p>
@@ -148,13 +218,11 @@
                 <p class="text-lg text-gray-600">Pela conclusão com sucesso do módulo didático</p>
                 <p class="text-xl font-semibold text-gray-800 mt-1">"A Magia das Marés"</p>
                 <p class="text-lg text-gray-700 mt-6">Com uma pontuação de:</p>
-                <!-- Pontuação Atualizada -->
                 <div id="pontuacao-texto" class="mt-2">
                     <!-- Pontuação injetada pelo JS -->
                 </div>
             </div>
             
-            <!-- Botões (não serão impressos) -->
             <div class="mt-8 space-x-4 no-print">
                 <button onclick="printCertificate()" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-300">
                     Imprimir Certificado
@@ -167,13 +235,13 @@
 
     </div>
 
-    <!-- ECRÃ MODAL DE IMAGEM (PARA ZOOM) -->
+    <!-- ECRÃ MODAL DE IMAGEM (Sem alterações) -->
     <div id="image-modal" class="fixed inset-0 bg-black bg-opacity-75 items-center justify-center p-4 z-50" onclick="closeModal()">
         <img id="modal-image" src="" alt="Imagem Ampliada" class="max-w-full max-h-full rounded-lg shadow-lg" onclick="event.stopPropagation()">
         <button class="absolute top-4 right-4 text-white text-5xl font-bold leading-none" onclick="closeModal()">&times;</button>
     </div>
 
-    <!-- ECRÃ MODAL DE VÍDEO (ADICIONADO) -->
+    <!-- ECRÃ MODAL DE VÍDEO (Sem alterações) -->
     <div id="video-modal" class="fixed inset-0 bg-black bg-opacity-75 items-center justify-center p-4 z-50" onclick="closeVideoModal()">
         <div class="relative bg-black rounded-lg shadow-lg w-full max-w-2xl" onclick="event.stopPropagation()">
             <video id="video-player" class="w-full rounded-lg" controls>
@@ -189,6 +257,7 @@
         // --- DADOS DA APLICAÇÃO ---
 
         const slideData = [
+            // ... (Dados dos slides mantêm-se inalterados)
             {
                 title: "O Pulso do Planeta",
                 image: "./imagem1.png",
@@ -231,8 +300,8 @@
             }
         ];
 
-        // --- QUIZ AUMENTADO PARA 8 PERGUNTAS ---
         const quizData = [
+            // ... (Dados do quiz mantêm-se inalterados)
             {
                 question: "Qual é a PRINCIPAL causa das marés?",
                 options: ["O vento forte no oceano", "A rotação da Terra", "A força de maré da Lua", "O calor do Sol"],
@@ -275,6 +344,41 @@
             }
         ];
 
+        // --- NOVOS DADOS PARA O EXERCÍCIO (Extraído do PDF) ---
+        const exerciseData = [
+            {
+                id: "term-1",
+                term: "Preamar (PM)",
+                definition: "A maior altura que as águas alcançam numa oscilação de maré."
+            },
+            {
+                id: "term-2",
+                term: "Baixa-mar (BM)",
+                definition: "A menor altura que as águas alcançam numa oscilação de maré."
+            },
+            {
+                id: "term-3",
+                term: "Marés de Sizígia (Vivas)",
+                definition: "Marés com maior amplitude, quando Sol, Terra e Lua estão alinhados."
+            },
+            {
+                id: "term-4",
+                term: "Marés de Quadratura (Mortas)",
+                definition: "Marés com menor amplitude, quando Sol e Lua se opõem (ângulo 90º)."
+            },
+            {
+                id: "term-5",
+                term: "Amplitude da Maré",
+                definition: "A distância vertical entre uma preamar e uma baixa-mar consecutivas."
+            },
+            {
+                id: "term-6",
+                term: "Dia Lunar",
+                definition: "O tempo de rotação da Terra em relação à Lua (24h 50min)."
+            }
+        ];
+
+
         // --- LÓGICA DA APLICAÇÃO ---
 
         let currentSlide = 0;
@@ -283,7 +387,12 @@
         let userAnswers = new Array(quizData.length).fill(null);
         let score = 0;
 
-        // Função para trocar de ecrã
+        // Variáveis do exercício
+        let correctPairs = 0;
+        let draggedElement = null; // Para guardar o elemento a ser arrastado
+
+
+        // Função para trocar de ecrã (Inalterada)
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(screen => {
                 screen.style.display = 'none';
@@ -291,96 +400,72 @@
             document.getElementById(screenId).style.display = 'block';
         }
 
-        // --- Lógica dos Slides e Modal ---
-
+        // --- Lógica dos Slides e Modal (Inalterada) ---
         function startApp() {
             showScreen('slides-screen');
             loadSlide(0);
         }
-
-        // Novas funções de navegação
         function goToHome() {
             showScreen('welcome-screen');
         }
-
         function goToSlides() {
             showScreen('slides-screen');
         }
-
         function loadSlide(slideIndex) {
             const slide = slideData[slideIndex];
             const contentDiv = document.getElementById('slide-content');
-            
-            // Adicionado cursor-pointer e onclick para abrir o modal
             contentDiv.innerHTML = `
                 <h2 class="text-3xl font-bold text-blue-900 mb-4">${slide.title}</h2>
                 <img src="${slide.image}" alt="${slide.title}" class="w-full h-64 md:h-80 object-cover rounded-lg shadow-md mb-6 cursor-pointer" onerror="this.src='https://placehold.co/600x400/e2e8f0/94a3b8?text=Imagem+N%C3%A3o+Encontrada'; this.onerror=null;" onclick="openModal('${slide.image}')">
                 <p class="text-lg text-gray-700 leading-relaxed">${slide.text}</p>
             `;
-            
-            // Atualizar contador
             document.getElementById('slide-counter').textContent = `Módulo ${slideIndex + 1} de ${slideData.length}`;
-            
-            // Gerir botões
             document.getElementById('prev-btn').style.display = (slideIndex === 0) ? 'none' : 'inline-block';
-            
             if (slideIndex === slideData.length - 1) {
                 document.getElementById('next-btn').textContent = 'Ir para o Quiz!';
             } else {
                 document.getElementById('next-btn').textContent = 'Próximo';
             }
         }
-
         function nextSlide() {
             if (currentSlide < slideData.length - 1) {
                 currentSlide++;
                 loadSlide(currentSlide);
             } else {
-                // Último slide, ir para o quiz
                 showScreen('quiz-start-screen');
             }
         }
-
         function prevSlide() {
             if (currentSlide > 0) {
                 currentSlide--;
                 loadSlide(currentSlide);
             }
         }
-
-        // Funções do Modal de Imagem
         function openModal(src) {
             document.getElementById('modal-image').src = src;
             document.getElementById('image-modal').classList.add('flex');
         }
-
         function closeModal() {
             document.getElementById('image-modal').classList.remove('flex');
         }
-
-        // Funções do Modal de Vídeo (Alteradas para evitar AbortError)
         async function openVideoModal() {
             document.getElementById('video-modal').classList.add('flex');
             try {
-                // O play() devolve uma promessa. Vamos aguardar por ela.
                 await document.getElementById('video-player').play();
             } catch (err) {
-                // Se o utilizador fechar o modal rapidamente, um AbortError
-                // pode ser lançado. Podemos ignorá-lo com segurança.
                 if (err.name !== 'AbortError') {
                     console.error("Erro ao tentar reproduzir o vídeo:", err);
                 }
             }
         }
-
         function closeVideoModal() {
             document.getElementById('video-modal').classList.remove('flex');
             document.getElementById('video-player').pause();
-            document.getElementById('video-player').currentTime = 0; // Reinicia o vídeo
+            document.getElementById('video-player').currentTime = 0;
         }
 
 
-        // --- Lógica do Quiz com Feedback Imediato ---
+        // --- Lógica do Quiz (Inalterada) ---
 
         function startQuiz() {
             userName = document.getElementById('nome-aluno').value;
@@ -394,14 +479,11 @@
                 loadQuestion(0);
             }
         }
-
         function loadQuestion(questionIndex) {
             const question = quizData[questionIndex];
             const contentDiv = document.getElementById('question-content');
-            
             let optionsHtml = '';
             question.options.forEach((option, index) => {
-                // A função checkAnswer será chamada no onchange
                 optionsHtml += `
                     <label class="block w-full p-4 border border-gray-300 rounded-lg mb-3 hover:bg-blue-50 cursor-pointer">
                         <input type="radio" name="q${questionIndex}" value="${option}" class="mr-3" onchange="checkAnswer(this)">
@@ -409,25 +491,17 @@
                     </label>
                 `;
             });
-            
             contentDiv.innerHTML = `
                 <p class="text-xl text-gray-800 mb-6">${question.question}</p>
                 <div class="space-y-3" id="options-container">${optionsHtml}</div>
                 <div id="feedback-message" class="mt-4 text-lg font-bold"></div>
             `;
-            
-            // Atualizar cabeçalho
             document.getElementById('question-number').textContent = questionIndex + 1;
             document.getElementById('total-questions').textContent = quizData.length;
-            
-            // Gerir botões
             const nextBtn = document.getElementById('next-question-btn');
             const finishBtn = document.getElementById('finish-quiz-btn');
-
-            // Desativar botões até que uma resposta seja dada
             nextBtn.disabled = true;
             finishBtn.disabled = true;
-
             if (questionIndex === quizData.length - 1) {
                 nextBtn.style.display = 'none';
                 finishBtn.style.display = 'inline-block';
@@ -436,32 +510,23 @@
                 finishBtn.style.display = 'none';
             }
         }
-
         function checkAnswer(selectedRadio) {
             const questionIndex = currentQuestion;
             const selectedValue = selectedRadio.value;
             const question = quizData[questionIndex];
             const feedbackEl = document.getElementById('feedback-message');
-            
-            // Salvar resposta
             userAnswers[questionIndex] = selectedValue;
-
-            // Desativar todas as opções para esta pergunta
             const radios = document.querySelectorAll(`input[name="q${questionIndex}"]`);
             radios.forEach(radio => {
                 radio.disabled = true;
                 const label = radio.parentElement;
                 label.classList.remove('hover:bg-blue-50', 'cursor-pointer');
-
-                // Aplicar estilos de feedback
                 if (radio.value === question.correct) {
                     label.classList.add('bg-green-200', 'border-green-400');
                 } else if (radio.value === selectedValue) {
                     label.classList.add('bg-red-200', 'border-red-400');
                 }
             });
-
-            // Mostrar mensagem de feedback
             if (selectedValue === question.correct) {
                 feedbackEl.textContent = "Correto! 🎉";
                 feedbackEl.className = "mt-4 text-lg font-bold text-green-600";
@@ -469,26 +534,21 @@
                 feedbackEl.textContent = "Incorreto. A resposta certa está a verde.";
                 feedbackEl.className = "mt-4 text-lg font-bold text-red-600";
             }
-
-            // Ativar o botão de próxima pergunta ou finalizar
             if (currentQuestion === quizData.length - 1) {
                 document.getElementById('finish-quiz-btn').disabled = false;
             } else {
                 document.getElementById('next-question-btn').disabled = false;
             }
         }
-
         function nextQuestion() {
-            // A resposta já foi guardada em checkAnswer
             if (currentQuestion < quizData.length - 1) {
                 currentQuestion++;
                 loadQuestion(currentQuestion);
             }
         }
 
+        // --- FUNÇÃO SUBMITQUIZ ATUALIZADA ---
         function submitQuiz() {
-            // A resposta final já foi guardada em checkAnswer
-            
             // Calcular pontuação
             score = 0;
             for (let i = 0; i < quizData.length; i++) {
@@ -497,15 +557,152 @@
                 }
             }
             
+            // Em vez de mostrar os resultados, vamos para o exercício
+            startExercise();
+        }
+
+        // --- NOVAS FUNÇÕES: LÓGICA DO EXERCÍCIO ---
+
+        function startExercise() {
+            correctPairs = 0; // Reiniciar contador
+            const termContainer = document.getElementById('term-container');
+            const definitionContainer = document.getElementById('definition-container');
+
+            termContainer.innerHTML = '';
+            definitionContainer.innerHTML = '';
+
+            // Função para baralhar o array (Fisher-Yates shuffle)
+            function shuffle(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+
+            // Criar e baralhar os termos
+            const shuffledTerms = shuffle([...exerciseData]);
+
+            shuffledTerms.forEach(item => {
+                const termEl = document.createElement('div');
+                termEl.id = item.id;
+                termEl.className = "draggable bg-blue-100 border border-blue-300 p-3 rounded-lg text-blue-900 font-semibold shadow-sm";
+                termEl.draggable = true;
+                termEl.textContent = item.term;
+                termContainer.appendChild(termEl);
+            });
+
+            // Criar as definições (em ordem)
+            exerciseData.forEach(item => {
+                const defEl = document.createElement('div');
+                defEl.className = "flex items-center space-x-4";
+                defEl.innerHTML = `
+                    <div id="drop-${item.id}" 
+                         class="dropzone w-1/3 h-14 bg-gray-100 border-2 border-dashed border-gray-400 rounded-lg" 
+                         data-term-id="${item.id}">
+                    </div>
+                    <span class="w-2/3 text-gray-700">${item.definition}</span>
+                `;
+                definitionContainer.appendChild(defEl);
+            });
+
+            // Adicionar event listeners para drag & drop
+            addDragDropListeners();
+
+            // Mostrar o ecrã do exercício
+            showScreen('exercise-screen');
+        }
+
+        function addDragDropListeners() {
+            const draggables = document.querySelectorAll('.draggable');
+            const dropzones = document.querySelectorAll('.dropzone');
+
+            draggables.forEach(draggable => {
+                draggable.addEventListener('dragstart', handleDragStart);
+                draggable.addEventListener('dragend', handleDragEnd);
+            });
+
+            dropzones.forEach(zone => {
+                zone.addEventListener('dragover', handleDragOver);
+                zone.addEventListener('dragenter', handleDragEnter);
+                zone.addEventListener('dragleave', handleDragLeave);
+                zone.addEventListener('drop', handleDrop);
+            });
+        }
+
+        function handleDragStart(e) {
+            draggedElement = this; // 'this' é o elemento arrastado
+            this.classList.add('dragging');
+            e.dataTransfer.setData('text/plain', this.id);
+        }
+
+        function handleDragEnd() {
+            this.classList.remove('dragging');
+            draggedElement = null;
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault(); // Necessário para permitir o 'drop'
+        }
+
+        function handleDragEnter(e) {
+            e.preventDefault();
+            if (!this.classList.contains('correct')) {
+                this.classList.add('drop-over');
+            }
+        }
+
+        function handleDragLeave() {
+            if (!this.classList.contains('correct')) {
+                this.classList.remove('drop-over');
+            }
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            this.classList.remove('drop-over');
+
+            // Se a caixa já estiver correta, não fazer nada
+            if (this.classList.contains('correct')) {
+                return;
+            }
+
+            const droppedTermId = e.dataTransfer.getData('text/plain');
+            const expectedTermId = this.dataset.termId;
+
+            if (droppedTermId === expectedTermId) {
+                // CORRETO!
+                this.classList.add('correct');
+                this.innerHTML = ''; // Limpar a caixa (se tiver algo)
+                this.appendChild(draggedElement); // Mover o termo para dentro da caixa
+                
+                draggedElement.classList.add('correct');
+                draggedElement.draggable = false; // Desativar arrastar
+                
+                correctPairs++;
+                
+                // Verificar se o exercício terminou
+                if (correctPairs === exerciseData.length) {
+                    document.getElementById('finish-exercise-btn').disabled = false;
+                }
+            } else {
+                // Incorreto - não faz nada, o 'dragend' tratará de o re-mostrar
+            }
+        }
+
+        // --- LÓGICA DO CERTIFICADO E REINÍCIO ---
+
+        // NOVA FUNÇÃO para mostrar os resultados (separada do submitQuiz)
+        function showResults() {
             const totalQuestions = quizData.length;
-            const incorrect = totalQuestions - score;
+            const incorrect = totalQuestions - score; // 'score' foi definido em submitQuiz()
             const percentage = Math.round((score / totalQuestions) * 100);
 
-            // Mostrar resultados
+            // Mostrar ecrã de resultados
             showScreen('result-screen');
             document.getElementById('nome-certificado').textContent = userName;
             
-            // Nova secção de pontuação
+            // Preencher pontuação
             document.getElementById('pontuacao-texto').innerHTML = `
                 <span class="text-4xl font-bold text-green-600">${percentage}%</span>
                 <p class="text-lg text-gray-700 mt-2">
@@ -514,19 +711,23 @@
             `;
         }
 
-        // --- Lógica do Certificado e Reinício ---
 
         function printCertificate() {
             window.print();
         }
 
+        // ATUALIZADA: Reiniciar também as variáveis do exercício
         function restartApp() {
             currentSlide = 0;
             currentQuestion = 0;
             userName = "";
             userAnswers = new Array(quizData.length).fill(null);
             score = 0;
+            correctPairs = 0; // Resetar
+            
             document.getElementById('nome-aluno').value = '';
+            document.getElementById('finish-exercise-btn').disabled = true; // Resetar botão
+            
             showScreen('welcome-screen');
         }
 
